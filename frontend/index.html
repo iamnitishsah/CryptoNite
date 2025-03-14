@@ -1,13 +1,38 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <!-- Favicon: Bitcoin icon from a public URL -->
+  <link rel="icon" type="image/png" href="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f4b0.png" />
+  <!-- Viewport for responsiveness -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Title with project name -->
+  <title>CryptoNite - Price Predictor</title>
+  <!-- Google Fonts: Poppins for a clean, modern look -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" />
+  <style>
+    /* Minimal inline CSS for body and loading state */
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #111827; /* Tailwind's gray-900 */
+      font-family: 'Poppins', sans-serif;
+      color: #e5e7eb; /* Tailwind's gray-200 */
+    }
+    #root:empty::before {
+      content: 'Loading CryptoNite...';
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #a5b4fc; /* Tailwind's indigo-300 */
+    }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="module" src="/src/main.jsx"></script>
+</body>
 </html>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Line } from 'react-chartjs-2';
 import 'chart.js/auto';
 import axios from 'axios';
+import { motion } from 'framer-motion';
 
 function App() {
     const [data, setData] = useState({ historical: [], predictions: [] });
@@ -16,7 +17,7 @@ function App() {
             const response = await axios.get('http://127.0.0.1:8000/api/data/');
             setData({
                 historical: response.data.historical,
-                predictions: response.data.predictions
+                predictions: response.data.predictions,
             });
         } catch (err) {
             console.error('Error fetching crypto data:', err);
@@ -44,29 +45,30 @@ function App() {
     // Sort historical data latest first for the table
     const sortedHistorical = [...data.historical].sort((a, b) => new Date(b.date) - new Date(a.date));
 
-    // Chart data (keeps chronological order: oldest to newest)
+    // Chart data
     const chartData = {
-        labels: [
-            ...data.historical.map(d => formatDate(d.date)),
-            ...data.predictions.map(d => formatDate(d.date)),
-        ],
+        labels: [...data.historical.map(d => formatDate(d.date)), ...data.predictions.map(d => formatDate(d.date))],
         datasets: [
             {
                 label: 'Historical Prices (USD)',
                 data: [...data.historical.map(d => d.price), ...Array(data.predictions.length).fill(null)],
-                borderColor: '#3B82F6', // Blue
-                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                borderColor: '#00FFFF', // Cyan glow
+                backgroundColor: 'rgba(0, 255, 255, 0.2)',
                 fill: false,
-                tension: 0.3,
+                tension: 0.4,
+                pointRadius: 0,
+                borderWidth: 2,
             },
             {
                 label: 'Predicted Prices (USD)',
                 data: [...Array(data.historical.length).fill(null), ...data.predictions.map(d => d.predicted_price)],
-                borderColor: '#EF4444', // Red
+                borderColor: '#FF00FF', // Magenta glow
+                backgroundColor: 'rgba(255, 0, 255, 0.2)',
                 borderDash: [5, 5],
-                backgroundColor: 'rgba(239, 68, 68, 0.1)',
                 fill: false,
-                tension: 0.3,
+                tension: 0.4,
+                pointRadius: 0,
+                borderWidth: 2,
             },
         ],
     };
@@ -76,17 +78,17 @@ function App() {
         maintainAspectRatio: false,
         scales: {
             x: {
-                title: { display: true, text: 'Date', color: '#D1D5DB' },
-                ticks: { color: '#D1D5DB' },
-                grid: { color: '#374151' },
+                title: { display: true, text: 'Date', color: '#A5B4FC', font: { size: 14 } },
+                ticks: { color: '#A5B4FC' },
+                grid: { color: 'rgba(165, 180, 252, 0.1)' },
             },
             y: {
-                title: { display: true, text: 'Price (USD)', color: '#D1D5DB' },
+                title: { display: true, text: 'Price (USD)', color: '#A5B4FC', font: { size: 14 } },
                 ticks: {
-                    color: '#D1D5DB',
+                    color: '#A5B4FC',
                     callback: (value) => `$${formatPrice(value)}`,
                 },
-                grid: { color: '#374151' },
+                grid: { color: 'rgba(165, 180, 252, 0.1)' },
                 beginAtZero: false,
             },
         },
@@ -94,9 +96,12 @@ function App() {
             legend: {
                 display: true,
                 position: 'top',
-                labels: { color: '#D1D5DB' },
+                labels: { color: '#E0E7FF', font: { size: 12 } },
             },
             tooltip: {
+                backgroundColor: 'rgba(17, 24, 39, 0.9)',
+                titleColor: '#E0E7FF',
+                bodyColor: '#E0E7FF',
                 callbacks: {
                     label: (context) => {
                         const label = context.dataset.label || '';
@@ -109,90 +114,138 @@ function App() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-900 text-gray-100 p-6">
+        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-900 text-gray-100 p-8">
             <div className="container mx-auto">
-                <h1 className="text-4xl font-bold text-center mb-8 text-blue-400">Crypto Price Predictor</h1>
+                {/* Header */}
+                <motion.h1
+                    initial={{ opacity: 0, y: -50 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, ease: 'easeOut' }}
+                    className="text-5xl font-extrabold text-center mb-10 bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-purple-500"
+                >
+                    Crypto Price Predictor
+                </motion.h1>
 
                 {/* Error and Loading States */}
                 {error ? (
-                    <div className="text-center">
-                        <p className="text-red-400 mb-4">{error}</p>
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="text-center"
+                    >
+                        <p className="text-red-400 mb-4 text-lg">{error}</p>
                         <button
                             onClick={fetchCryptoData}
-                            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+                            className="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-full hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 shadow-lg"
                         >
                             Retry
                         </button>
-                    </div>
+                    </motion.div>
                 ) : loading ? (
-                    <div className="flex justify-center items-center h-96">
-                        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
-                    </div>
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="flex justify-center items-center h-96"
+                    >
+                        <div className="animate-spin rounded-full h-20 w-20 border-t-4 border-cyan-400 shadow-lg"></div>
+                    </motion.div>
                 ) : (
                     <>
                         {/* Chart Section */}
-                        <div className="bg-gray-800 p-6 rounded-lg shadow-lg mb-8">
-                            <h2 className="text-2xl font-semibold mb-4 text-gray-200">Price Trend</h2>
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 0.6 }}
+                            className="bg-gray-800 bg-opacity-80 backdrop-blur-md p-8 rounded-xl shadow-2xl mb-10 border border-indigo-500/20"
+                        >
+                            <h2 className="text-3xl font-semibold mb-6 text-indigo-300">Price Trend</h2>
                             <div className="w-full h-96">
                                 <Line data={chartData} options={options} />
                             </div>
-                        </div>
+                        </motion.div>
 
                         {/* Data Table Section */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            {/* Historical Data Table (Latest First) */}
-                            <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
-                                <h2 className="text-2xl font-semibold mb-4 text-gray-200">Historical Data</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                            {/* Historical Data Table */}
+                            <motion.div
+                                initial={{ opacity: 0, x: -50 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ duration: 0.6, delay: 0.2 }}
+                                className="bg-gray-800 bg-opacity-80 backdrop-blur-md p-8 rounded-xl shadow-2xl border border-cyan-500/20"
+                            >
+                                <h2 className="text-2xl font-semibold mb-6 text-cyan-300">Historical Data</h2>
                                 <div className="overflow-x-auto">
                                     <table className="w-full text-left">
                                         <thead>
-                                        <tr className="border-b border-gray-700">
-                                            <th className="py-2 px-4 text-gray-400">Date</th>
-                                            <th className="py-2 px-4 text-gray-400">Price (USD)</th>
+                                        <tr className="border-b border-indigo-500/30">
+                                            <th className="py-3 px-4 text-indigo-400">Date</th>
+                                            <th className="py-3 px-4 text-indigo-400">Price (USD)</th>
                                         </tr>
                                         </thead>
                                         <tbody>
                                         {sortedHistorical.map((item, index) => (
-                                            <tr key={index} className="border-b border-gray-700">
-                                                <td className="py-2 px-4 text-gray-300">{formatDate(item.date)}</td>
-                                                <td className="py-2 px-4 text-gray-300">${formatPrice(item.price)}</td>
-                                            </tr>
+                                            <motion.tr
+                                                key={index}
+                                                initial={{ opacity: 0 }}
+                                                animate={{ opacity: 1 }}
+                                                transition={{ duration: 0.3, delay: index * 0.05 }}
+                                                className="border-b border-indigo-500/20 hover:bg-indigo-900/50 transition-colors"
+                                            >
+                                                <td className="py-3 px-4 text-gray-200">{formatDate(item.date)}</td>
+                                                <td className="py-3 px-4 text-gray-200">${formatPrice(item.price)}</td>
+                                            </motion.tr>
                                         ))}
                                         </tbody>
                                     </table>
                                 </div>
-                            </div>
+                            </motion.div>
 
                             {/* Predictions Table */}
-                            <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
-                                <h2 className="text-2xl font-semibold mb-4 text-gray-200">Predicted Prices</h2>
+                            <motion.div
+                                initial={{ opacity: 0, x: 50 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ duration: 0.6, delay: 0.4 }}
+                                className="bg-gray-800 bg-opacity-80 backdrop-blur-md p-8 rounded-xl shadow-2xl border border-purple-500/20"
+                            >
+                                <h2 className="text-2xl font-semibold mb-6 text-purple-300">Predicted Prices</h2>
                                 <div className="overflow-x-auto">
                                     <table className="w-full text-left">
                                         <thead>
-                                        <tr className="border-b border-gray-700">
-                                            <th className="py-2 px-4 text-gray-400">Date</th>
-                                            <th className="py-2 px-4 text-gray-400">Price (USD)</th>
+                                        <tr className="border-b border-purple-500/30">
+                                            <th className="py-3 px-4 text-purple-400">Date</th>
+                                            <th className="py-3 px-4 text-purple-400">Price (USD)</th>
                                         </tr>
                                         </thead>
                                         <tbody>
                                         {data.predictions.map((item, index) => (
-                                            <tr key={index} className="border-b border-gray-700">
-                                                <td className="py-2 px-4 text-gray-300">{formatDate(item.date)}</td>
-                                                <td className="py-2 px-4 text-gray-300">${formatPrice(item.predicted_price)}</td>
-                                            </tr>
+                                            <motion.tr
+                                                key={index}
+                                                initial={{ opacity: 0 }}
+                                                animate={{ opacity: 1 }}
+                                                transition={{ duration: 0.3, delay: index * 0.05 }}
+                                                className="border-b border-purple-500/20 hover:bg-purple-900/50 transition-colors"
+                                            >
+                                                <td className="py-3 px-4 text-gray-200">{formatDate(item.date)}</td>
+                                                <td className="py-3 px-4 text-gray-200">${formatPrice(item.predicted_price)}</td>
+                                            </motion.tr>
                                         ))}
                                         </tbody>
                                     </table>
                                 </div>
-                            </div>
+                            </motion.div>
                         </div>
                     </>
                 )}
 
                 {/* Disclaimer */}
-                <p className="text-sm text-gray-500 mt-8 text-center">
+                <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.8, delay: 0.6 }}
+                    className="text-sm text-gray-400 mt-10 text-center"
+                >
                     Note: Predictions are for educational purposes only, not financial advice.
-                </p>
+                </motion.p>
             </div>
         </div>
     );
