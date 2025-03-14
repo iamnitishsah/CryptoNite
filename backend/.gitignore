@@ -1,0 +1,40 @@
+# Python/Django
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+*.env
+*.env.*
+env.bak/
+venv.bak/
+
+# Django
+*.log
+*.pot
+*.sqlite3
+db.sqlite3
+migrations/
+media/
+staticfiles/
+
+# IDEs and Editors
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# macOS
+.DS_Store
+
+# Model files (specific to your project)
+improved_lstm_model.h5
+lstm_model.h5
+scaler.pkl
+
+# Dependency management
+pip-log.txt
+Pipfile.lock
